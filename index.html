@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2A2829">
+  <title>Student Performance Predictor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">SP</div>
+      <div>
+        <div class="brand-title">Student Performance</div>
+        <div class="brand-subtitle">Prediction & Assistance</div>
+      </div>
+    </div>
+    <div class="api-pill"><span></span> Random Forest API</div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">ACADEMIC ANALYTICS</p>
+        <h1>Predict performance.<br><em>Identify support early.</em></h1>
+        <p class="hero-text">
+          Enter the student's academic and background details to estimate total marks
+          and determine whether academic assistance may be needed.
+        </p>
+      </div>
+      <div class="model-card">
+        <small>DEPLOYED MODELS</small>
+        <strong>Random Forest</strong>
+        <p>Regression + Classification</p>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <form id="predictionForm" class="card form-card">
+        <div class="card-header">
+          <div>
+            <p class="section-label">STUDENT PROFILE</p>
+            <h2>Enter student details</h2>
+          </div>
+          <button type="button" id="resetBtn" class="reset-btn">Reset</button>
+        </div>
+
+        <div class="section-block">
+          <h3>Academic factors</h3>
+          <div class="grid three">
+            <label class="field">
+              <span>Age</span>
+              <input id="age" type="number" min="10" max="30" step="1" value="18" required>
+              <small>Student age</small>
+            </label>
+            <label class="field">
+              <span>Study hours / day</span>
+              <input id="study_hours" type="number" min="0" max="24" step="0.5" value="4" required>
+              <small>Average daily study time</small>
+            </label>
+            <label class="field">
+              <span>Attendance</span>
+              <div class="input-unit">
+                <input id="attendance_percentage" type="number" min="0" max="100" step="0.1" value="85" required>
+                <b>%</b>
+              </div>
+              <small>Attendance percentage</small>
+            </label>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <h3>Background & habits</h3>
+          <div class="grid two">
+            <label class="field">
+              <span>Gender</span>
+              <select id="gender" required>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>School type</span>
+              <select id="school_type" required>
+                <option value="private">Private</option>
+                <option value="public">Public</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Parent education</span>
+              <select id="parent_education" required>
+                <option value="no formal">No formal</option>
+                <option value="high school">High school</option>
+                <option value="diploma">Diploma</option>
+                <option value="graduate" selected>Graduate</option>
+                <option value="post graduate">Post graduate</option>
+                <option value="phd">PhD</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Travel time</span>
+              <select id="travel_time" required>
+                <option value="&lt;15 min">&lt;15 min</option>
+                <option value="15-30 min" selected>15–30 min</option>
+                <option value="30-60 min">30–60 min</option>
+                <option value="&gt;60 min">&gt;60 min</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Internet access</span>
+              <select id="internet_access" required>
+                <option value="yes" selected>Yes</option>
+                <option value="no">No</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Extra activities</span>
+              <select id="extra_activities" required>
+                <option value="yes" selected>Yes</option>
+                <option value="no">No</option>
+              </select>
+            </label>
+            <label class="field full">
+              <span>Study method</span>
+              <select id="study_method" required>
+                <option value="mixed" selected>Mixed</option>
+                <option value="textbook">Textbook</option>
+                <option value="notes">Notes</option>
+                <option value="online videos">Online videos</option>
+                <option value="group study">Group study</option>
+                <option value="coaching">Coaching</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <p class="note"><span>◆</span> Student ID is not required. The deployed models use the profile above.</p>
+          <button id="predictBtn" class="primary-btn" type="submit">
+            <span id="buttonText">Predict outcome</span><b>→</b>
+          </button>
+        </div>
+        <div id="errorBox" class="error" hidden></div>
+      </form>
+
+      <aside id="resultCard" class="card result-card">
+        <div id="emptyState" class="empty-state">
+          <div class="result-icon">◎</div>
+          <p class="section-label">PREDICTION RESULT</p>
+          <h2>Your result will appear here</h2>
+          <p>Run a prediction to see estimated total marks and the academic assistance classification.</p>
+          <div class="mini-row">
+            <div><strong>0–300</strong><small>possible total marks</small></div>
+            <div><strong>2</strong><small>predictions per run</small></div>
+          </div>
+        </div>
+
+        <div id="resultState" class="result-state" hidden>
+          <p class="section-label">PREDICTION RESULT</p>
+          <h2>Student outlook</h2>
+
+          <div class="score-box">
+            <span>Estimated total marks</span>
+            <strong id="marksValue">—</strong>
+            <small>out of 300</small>
+          </div>
+
+          <div id="assistanceBox" class="assistance-box">
+            <div id="assistanceIcon" class="assistance-icon">✓</div>
+            <div>
+              <span>Academic assistance</span>
+              <strong id="assistanceValue">—</strong>
+            </div>
+          </div>
+
+          <div class="interpretation">
+            <strong id="interpretationTitle">—</strong>
+            <p>This prediction is an additional signal, not a final academic assessment.</p>
+          </div>
+
+          <button id="againBtn" class="secondary-btn" type="button">Run another prediction</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="metrics">
+      <div><strong>91.52%</strong><span>Regression R²</span></div>
+      <div><strong>95.92%</strong><span>Classification accuracy</span></div>
+      <div><strong>92.26%</strong><span>Classification F1</span></div>
+      <div><strong>2 models</strong><span>Final deployment</span></div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Student Performance & Assistance Prediction</span>
+    <a href="https://student-performance-and-assistance.onrender.com/docs" target="_blank" rel="noopener noreferrer">API documentation ↗</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
