@@ -17,15 +17,15 @@ app.add_middleware(
 
 # Load trained models
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, "model")
 
 regression_model = joblib.load(
-    os.path.join(BASE_DIR, "random_forest_regressor.pkl")
+    os.path.join(MODEL_DIR, "random_forest_regressor.pkl.bz2")
 )
 
 classification_model = joblib.load(
-    os.path.join(BASE_DIR, "random_forest_classifier.pkl")
+    os.path.join(MODEL_DIR, "random_forest_classifier.pkl.bz2")
 )
-
 
 @app.get("/")
 def home():
